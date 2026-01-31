@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Service;
+
+class ServiceController extends Controller
+{
+        public function byDivision($divisionId)
+    {
+        return response()->json(
+            Service::where('division_id', $divisionId)
+                ->select('id', 'libelle')
+                ->get()
+        );
+    }
+}
