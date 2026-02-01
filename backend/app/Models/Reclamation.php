@@ -6,6 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reclamation extends Model
 {
+    protected $fillable = [
+    'objet',
+    'description',
+    'statut',
+    'commentaire',
+
+    'citoyen_id',
+    'direction_id',
+    'division_id',
+    'service_id',
+    'fonctionnaire_id',
+];
     public function citoyen()
 {
     return $this->belongsTo(Citoyen::class);

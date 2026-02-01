@@ -51,4 +51,42 @@ public function store(Request $request)
     return response()->json($reclamation, 201);
 }
 
+public function updateStatus(Request $request, Reclamation $reclamation)
+{
+    $request->validate([
+        'statut' => 'required|in:en_cours,traitee,retournee',
+        'commentaire' => 'nullable|string',
+    ]);
+
+    $reclamation->update([
+        'statut' => $request->statut,
+        'commentaire' => $request->commentaire,
+        'fonctionnaire_id' => $request->user()->fonctionnaire_id,
+    ]);
+
+    return response()->json([
+        'message' => 'Statut mis à jour',
+        'reclamation' => $reclamation,
+    ]);
+}
+
+public function reassign(Request $request, Reclamation $reclamation)
+{
+    $request->validate([
+        'service_id' => 'required|exists:services,id',
+    ]);
+
+    $reclamation->update([
+        'service_id' => $request->service_id,
+        'statut' => 'en_cours',
+        'commentaire' => null,
+        'fonctionnaire_id' => null,
+    ]);
+
+    return response()->json([
+        'message' => 'Réclamation réaffectée',
+        'reclamation' => $reclamation,
+    ]);
+}
+
 }

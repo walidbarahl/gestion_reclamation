@@ -26,3 +26,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/divisions/{division}/services', 
         [ServiceController::class, 'byDivision']);
 });
+
+Route::middleware(['auth:sanctum', 'role:fonctionnaire'])->group(function () {
+    Route::patch('/reclamations/{reclamation}/status', [ReclamationController::class, 'updateStatus']);
+});
+
+Route::middleware(['auth:sanctum', 'role:responsable'])->group(function () {
+    Route::patch('/reclamations/{reclamation}/reassign', [ReclamationController::class, 'reassign']);
+});
