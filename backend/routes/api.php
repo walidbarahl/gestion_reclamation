@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DirectionController;
 use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\AssignmentController;
+
 
 
 
@@ -34,3 +36,6 @@ Route::middleware(['auth:sanctum', 'role:fonctionnaire'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:responsable'])->group(function () {
     Route::patch('/reclamations/{reclamation}/reassign', [ReclamationController::class, 'reassign']);
 });
+
+Route::middleware(['auth:sanctum', 'role:responsable'])
+    ->patch('/reclamations/{reclamation}/assign', [AssignmentController::class, 'assign']);
