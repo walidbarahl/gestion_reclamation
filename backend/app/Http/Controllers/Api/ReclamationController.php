@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Citoyen;
 use App\Models\Reclamation;
 use Illuminate\Http\Request;
+use App\Models\ReclamationHistory;
+use Illuminate\Support\Facades\Auth;
 
 class ReclamationController extends Controller
 {
@@ -48,6 +50,14 @@ public function store(Request $request)
         'fonctionnaire_id' => $request->fonctionnaire_id,
     ]);
 
+    // record history
+    ReclamationHistory::create([
+    'reclamation_id' => $reclamation->id,
+    'user_id' => null, // citoyen (no auth user)
+    'action' => 'cree',
+    'commentaire' => 'Réclamation déposée',
+]);
+
     return response()->json($reclamation, 201);
 }
 
@@ -82,6 +92,15 @@ public function reassign(Request $request, Reclamation $reclamation)
         'commentaire' => null,
         'fonctionnaire_id' => null,
     ]);
+
+    // record reassign history
+
+    ReclamationHistory::create([
+    'reclamation_id' => $reclamation->id,
+    'user_id' => Auth::id(),
+    'action' => 'reaffectee',
+    'commentaire' => 'Réassignée à un autre service',
+]);
 
     return response()->json([
         'message' => 'Réclamation réaffectée',

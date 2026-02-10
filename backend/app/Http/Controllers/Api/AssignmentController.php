@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Reclamation;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Models\ReclamationHistory;
+use Illuminate\Support\Facades\Auth;
+
 
 class AssignmentController extends Controller
 {
@@ -26,6 +29,15 @@ class AssignmentController extends Controller
             'fonctionnaire_id' => $data['fonctionnaire_id'] ?? null,
             'statut' => 'en_cours',
             'commentaire' => $data['commentaire'] ?? null,
+        ]);
+
+        // record assignment history
+
+        ReclamationHistory::create([
+            'reclamation_id' => $reclamation->id,
+            'user_id' => Auth::id(), // responsable
+            'action' => 'affectee',
+            'commentaire' => 'Assignée au service ' . $reclamation->service_id,
         ]);
 
         return response()->json([

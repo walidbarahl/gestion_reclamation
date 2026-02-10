@@ -48,4 +48,9 @@ public function piecesJointes()
     return $this->hasMany(PieceJointe::class);
 }
 
+public function histories()
+{
+    return $this->hasMany(ReclamationHistory::class);
+}
+
 }

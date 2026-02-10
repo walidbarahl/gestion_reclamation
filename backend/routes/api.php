@@ -8,6 +8,10 @@ use App\Http\Controllers\Api\DirectionController;
 use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\AssignmentController;
+use App\Http\Controllers\Api\Fonctionnaire\ReclamationActionController;
+use App\Http\Controllers\Api\ReclamationHistoryController;
+
+
 
 
 
@@ -39,3 +43,22 @@ Route::middleware(['auth:sanctum', 'role:responsable'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:responsable'])
     ->patch('/reclamations/{reclamation}/assign', [AssignmentController::class, 'assign']);
+
+
+Route::middleware(['auth:sanctum', 'role:fonctionnaire'])->group(function () {
+
+    Route::patch(
+        '/reclamations/{reclamation}/reply',
+        [ReclamationActionController::class, 'reply']
+    );
+
+    Route::patch(
+        '/reclamations/{reclamation}/return',
+        [ReclamationActionController::class, 'return']
+    );
+});
+
+Route::middleware(['auth:sanctum'])->get(
+    '/reclamations/{reclamation}/history',
+    [ReclamationHistoryController::class, 'index']
+);
