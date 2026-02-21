@@ -8,6 +8,8 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Models\ReclamationHistory;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ReclamationService;
+
 
 
 class AssignmentController extends Controller
@@ -15,34 +17,26 @@ class AssignmentController extends Controller
     /**
      * Assign or reassign a reclamation
      */
-    public function assign(Request $request, Reclamation $reclamation)
-    {
-        $data = $request->validate([
-            'service_id' => ['required', 'exists:services,id'],
-            'fonctionnaire_id' => ['nullable', 'exists:fonctionnaires,id'],
-            'commentaire' => ['nullable', 'string'],
-        ]);
 
-        // Update assignment
-        $reclamation->update([
-            'service_id' => $data['service_id'],
-            'fonctionnaire_id' => $data['fonctionnaire_id'] ?? null,
-            'statut' => 'en_cours',
-            'commentaire' => $data['commentaire'] ?? null,
-        ]);
+public function assign(Request $request, Reclamation $reclamation)
+{
+    $data = $request->validate([
+        'service_id' => ['required', 'exists:services,id'],
+        'fonctionnaire_id' => ['nullable', 'exists:fonctionnaires,id'],
+        'commentaire' => ['nullable', 'string'],
+    ]);
 
-        // record assignment history
+    $reclamation = ReclamationService::assign(
+        $reclamation,
+        $data['service_id'],
+        $data['fonctionnaire_id'] ?? null,
+        $data['commentaire'] ?? null
+    );
 
-        ReclamationHistory::create([
-            'reclamation_id' => $reclamation->id,
-            'user_id' => Auth::id(), // responsable
-            'action' => 'affectee',
-            'commentaire' => 'Assignée au service ' . $reclamation->service_id,
-        ]);
+    return response()->json([
+        'message' => 'Réclamation assignée avec succès',
+        'reclamation' => $reclamation,
+    ]);
+}
 
-        return response()->json([
-            'message' => 'Réclamation assignée avec succès',
-            'reclamation' => $reclamation,
-        ]);
-    }
 }

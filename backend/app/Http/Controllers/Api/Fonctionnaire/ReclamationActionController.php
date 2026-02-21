@@ -7,6 +7,8 @@ use App\Models\Reclamation;
 use Illuminate\Http\Request;
 use App\Models\ReclamationHistory;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ReclamationService;
+
 
 
 class ReclamationActionController extends Controller
@@ -14,56 +16,39 @@ class ReclamationActionController extends Controller
     /**
      * Fonctionnaire reponds et traites la reclamation
      */
-    public function reply(Request $request, Reclamation $reclamation)
-    {
-        $request->validate([
-            'commentaire' => 'required|string',
-        ]);
 
-        $reclamation->update([
-            'statut' => 'traitee',
-            'commentaire' => $request->commentaire,
-        ]);
+public function reply(Request $request, Reclamation $reclamation)
+{
+    $request->validate([
+        'commentaire' => 'required|string',
+    ]);
 
-        ReclamationHistory::create([
-            'reclamation_id' => $reclamation->id,
-            'user_id' => Auth::id(),
-            'action' => 'en_cours',
-            'commentaire' => 'Traitement démarré',
-        ]);
+    $reclamation = ReclamationService::traiter(
+        $reclamation,
+        $request->commentaire
+    );
 
-        return response()->json([
-            'message' => 'Réclamation traitée avec succès',
-            'reclamation' => $reclamation,
-        ]);
-    }
+    return response()->json([
+        'message' => 'Réclamation traitée avec succès',
+        'reclamation' => $reclamation,
+    ]);
+}
 
+public function return(Request $request, Reclamation $reclamation)
+{
+    $request->validate([
+        'commentaire' => 'required|string',
+    ]);
 
-    /**
-     * Fonctionnaire returns the reclamation
-     */
-    public function return(Request $request, Reclamation $reclamation)
-    {
-        $request->validate([
-            'commentaire' => 'required|string',
-        ]);
+    $reclamation = ReclamationService::retourner(
+        $reclamation,
+        $request->commentaire
+    );
 
-        $reclamation->update([
-            'statut' => 'retournee',
-            'commentaire' => $request->commentaire,
-        ]);
+    return response()->json([
+        'message' => 'Réclamation retournée au responsable',
+        'reclamation' => $reclamation,
+    ]);
+}
 
-        ReclamationHistory::create([
-            'reclamation_id' => $reclamation->id,
-            'user_id' => Auth::id(),
-            'action' => 'retournee',
-            'commentaire' => $request->commentaire,
-        ]);
-
-
-        return response()->json([
-            'message' => 'Réclamation retournée au responsable',
-            'reclamation' => $reclamation,
-        ]);
-    }
 }
